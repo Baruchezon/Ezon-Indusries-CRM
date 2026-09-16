@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRM איזון תעשיות מתכת בע״מ</title>
+<style>
+:root{--nav:#1f252b;--nav2:#2e3740;--gold:#c69a4a;--bg:#eef1f3;--card:#fff;--ink:#20262b;--muted:#6e7881;--line:#dfe4e8;--good:#1b8f5a;--bad:#cc4b4b;--blue:#416c8c}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}.hidden{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#1f252b,#39444e)}.loginbox{width:min(430px,100%);background:#fff;border-radius:18px;padding:32px;box-shadow:0 18px 60px #0005;border-top:5px solid var(--gold)}.brand{font-size:24px;font-weight:800;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 22px}.field{margin:12px 0}.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff}.btn{border:0;border-radius:10px;padding:11px 16px;cursor:pointer;font-weight:700}.btn.primary{background:var(--gold);color:#1f252b}.btn.dark{background:var(--nav);color:#fff}.err{color:var(--bad);font-size:13px;margin-top:10px}
+#app{display:flex;min-height:100vh}.side{width:245px;background:var(--nav);color:#d7dde2;padding:18px 12px;position:sticky;top:0;height:100vh}.logo{padding:8px 10px 18px;border-bottom:1px solid #ffffff18;margin-bottom:12px}.logo b{display:block;color:#fff;font-size:18px}.logo small{color:#9da7ae}.navbtn{display:block;width:100%;text-align:right;border:0;background:transparent;color:#d7dde2;padding:12px;border-radius:10px;margin:4px 0;cursor:pointer}.navbtn.active,.navbtn:hover{background:var(--gold);color:#1e2429}.main{flex:1;padding:22px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;padding:15px 18px;border-radius:14px;box-shadow:0 2px 16px #00000010;margin-bottom:18px}.top h1{font-size:20px;margin:0}.status{font-size:12px;color:var(--good)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:var(--card);border-radius:14px;padding:17px;box-shadow:0 2px 12px #0000000d}.metric small{color:var(--muted)}.metric strong{display:block;font-size:28px;margin-top:6px}.section{margin-top:18px}.section h2{font-size:17px}.tablewrap{overflow:auto;border-radius:13px;border:1px solid var(--line);background:#fff}table{width:100%;border-collapse:collapse;min-width:780px}th{background:var(--nav2);color:#fff;text-align:right;padding:11px;font-size:13px}td{padding:10px 11px;border-bottom:1px solid var(--line);font-size:13px}tr:hover td{background:#f7f9fa}.tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px}.tag.good{background:#e7f7ef;color:var(--good)}.tag.bad{background:#fdeaea;color:var(--bad)}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.toolbar input,.toolbar select{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff}.view{display:none}.view.active{display:block}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.notice{padding:12px 14px;border-radius:10px;background:#fff8e9;border:1px solid #efd8a4;font-size:13px}
+@media(max-width:900px){#app{display:block}.side{width:100%;height:auto;position:relative;display:flex;gap:5px;overflow:auto}.logo{min-width:210px;border:0;margin:0}.navbtn{width:auto;white-space:nowrap}.main{padding:12px}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="loginbox">
+    <div class="brand">איזון תעשיות מתכת בע״מ</div>
+    <p class="sub">מערכת CRM וניהול ייצור</p>
+    <div class="field"><label>סיסמה</label><input id="password" type="password" autocomplete="current-password"></div>
+    <button class="btn primary" id="loginBtn">כניסה למערכת</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="side">
+    <div class="logo"><b>איזון תעשיות</b><small>CRM וניהול ייצור</small></div>
+    <button class="navbtn active" data-view="dashboard">דשבורד</button>
+    <button class="navbtn" data-view="orders">הזמנות ריווחית</button>
+    <button class="navbtn" data-view="production">ייצור</button>
+    <button class="navbtn" data-view="customers">לקוחות</button>
+    <button class="navbtn" data-view="report">דיווח ייצור</button>
+  </aside>
+  <main class="main">
+    <div class="top"><div><h1 id="title">דשבורד</h1><div class="status" id="conn">מחובר למסד הנתונים של איזון תעשיות</div></div><button class="btn dark" id="logoutBtn">יציאה</button></div>
+
+    <section id="dashboard" class="view active">
+      <div class="grid">
+        <div class="card metric"><small>הזמנות אחרונות</small><strong id="mOrders">0</strong></div>
+        <div class="card metric"><small>חשבוניות אחרונות</small><strong id="mInvoices">0</strong></div>
+        <div class="card metric"><small>עבודות ייצור</small><strong id="mJobs">0</strong></div>
+        <div class="card metric"><small>פריטי ייצור</small><strong id="mItems">0</strong></div>
+      </div>
+      <div class="section"><h2>הזמנות אחרונות</h2><div id="dashOrders"></div></div>
+      <div class="section"><h2>דיווחי ייצור אחרונים</h2><div id="dashLogs"></div></div>
+    </section>
+
+    <section id="orders" class="view"><div class="toolbar"><input id="orderSearch" placeholder="חיפוש לקוח או הזמנה"></div><div id="ordersTable"></div></section>
+    <section id="production" class="view"><div class="notice">הנתונים כאן מגיעים מטבלאות הייצור הקיימות של איזון תעשיות.</div><div class="section"><h2>עבודות ייצור</h2><div id="jobsTable"></div></div><div class="section"><h2>פריטי ייצור</h2><div id="itemsTable"></div></div></section>
+    <section id="customers" class="view"><div class="toolbar"><input id="customerSearch" placeholder="חיפוש לקוח"></div><div id="customersTable"></div></section>
+    <section id="report" class="view">
+      <div class="card">
+        <h2>דיווח ייצור חדש</h2>
+        <div class="formgrid">
+          <div class="field"><label>פריט ייצור</label><select id="rItem"></select></div>
+          <div class="field"><label>שלב בפריט</label><select id="rStage"><option value="">ללא שלב</option></select></div>
+          <div class="field"><label>תאריך</label><input id="rDate" type="date"></div>
+          <div class="field"><label>כמות</label><input id="rQty" type="number" step="0.01"></div>
+          <div class="field"><label>מכונה</label><input id="rMachine" placeholder="למשל Mazak או Haas"></div>
+          <div class="field"><label>הערות</label><textarea id="rNotes" rows="3"></textarea></div>
+        </div>
+        <button class="btn primary" id="saveReport">שמור דיווח</button><span id="saveMsg" style="margin-right:10px;font-size:13px"></span>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let state={orders:[],customers:[],jobs:[],items:[],stages:[],logs:[]};
+const fmt=n=>Number(n||0).toLocaleString('he-IL',{maximumFractionDigits:0});
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+async function api(url,opt={}){const r=await fetch(url,{headers:{'Content-Type':'application/json'},...opt}); if(r.status===401){showLogin();throw new Error('unauthorized')} const d=await r.json(); if(!r.ok) throw new Error(d.detail||d.error||'error'); return d}
+function showLogin(){$('#login').classList.remove('hidden');$('#app').classList.add('hidden')}
+function showApp(){$('#login').classList.add('hidden');$('#app').classList.remove('hidden')}
+function table(headers,rows){return `<div class="tablewrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')||`<tr><td colspan="${headers.length}">אין נתונים להצגה</td></tr>`}</tbody></table></div>`}
+async function login(){const password=$('#password').value;$('#loginErr').textContent='';try{await api('/api/login',{method:'POST',body:JSON.stringify({password})});showApp();await loadAll()}catch(e){$('#loginErr').textContent='הסיסמה אינה נכונה'}}
+async function loadAll(){
+  const d=await api('/api/dashboard'); Object.assign(state,d);
+  $('#mOrders').textContent=d.orders.length;$('#mInvoices').textContent=d.invoices.length;$('#mJobs').textContent=d.jobs.length;$('#mItems').textContent=d.items.length;
+  renderDash();
+  state.customers=await api('/api/customers'); state.stages=await api('/api/stages');
+  renderOrders();renderProduction();renderCustomers();fillReport();
+}
+function renderDash(){
+ $('#dashOrders').innerHTML=table(['מספר','לקוח','תאריך','סכום','סטטוס'],state.orders.slice(0,10).map(x=>`<tr><td>${esc(x.order_number)}</td><td>${esc(x.customer_name)}</td><td>${esc(x.order_date)}</td><td>₪ ${fmt(x.amount)}</td><td><span class="tag ${x.is_closed?'good':'bad'}">${x.is_closed?'סגורה':'פתוחה'}</span></td></tr>`));
+ $('#dashLogs').innerHTML=table(['תאריך','כמות','מכונה','הערות'],state.logs.slice(0,10).map(x=>`<tr><td>${esc(x.log_date)}</td><td>${fmt(x.quantity)}</td><td>${esc(x.machine_type)}</td><td>${esc(x.notes)}</td></tr>`));
+}
+function renderOrders(){const q=($('#orderSearch').value||'').toLowerCase();const arr=state.orders.filter(x=>`${x.order_number} ${x.customer_name}`.toLowerCase().includes(q));$('#ordersTable').innerHTML=table(['מספר הזמנה','לקוח','תאריך','סכום','סטטוס'],arr.map(x=>`<tr><td>${esc(x.order_number)}</td><td>${esc(x.customer_name)}</td><td>${esc(x.order_date)}</td><td>₪ ${fmt(x.amount)}</td><td>${x.is_closed?'סגורה':'פתוחה'}</td></tr>`))}
+function renderProduction(){
+ $('#jobsTable').innerHTML=table(['הזמנה','לקוח','סכום','חומר גלם','נוצר'],state.jobs.map(x=>`<tr><td>${esc(x.order_number)}</td><td>${esc(x.customer_name)}</td><td>₪ ${fmt(x.order_amount)}</td><td>${x.raw_material_available?'קיים':'נדרש טיפול'}</td><td>${esc((x.created_at||'').slice(0,10))}</td></tr>`));
+ $('#itemsTable').innerHTML=table(['תיאור','כמות','מקור חומר','חומר','קוטר','הערות'],state.items.map(x=>`<tr><td>${esc(x.description)}</td><td>${fmt(x.ordered_qty)}</td><td>${esc(x.raw_material_source)}</td><td>${esc(x.material_type)}</td><td>${esc(x.diameter)}</td><td>${esc(x.item_notes)}</td></tr>`));
+}
+function renderCustomers(){const q=($('#customerSearch').value||'').toLowerCase();const arr=state.customers.filter(x=>String(x.customer_name||'').toLowerCase().includes(q));$('#customersTable').innerHTML=table(['מספר לקוח','שם לקוח','עודכן'],arr.map(x=>`<tr><td>${esc(x.customer_id)}</td><td>${esc(x.customer_name)}</td><td>${esc((x.updated_at||'').slice(0,10))}</td></tr>`))}
+function fillReport(){
+ $('#rItem').innerHTML='<option value="">בחר פריט</option>'+state.items.map(x=>`<option value="${esc(x.id)}">${esc(x.description||x.id)} | כמות ${fmt(x.ordered_qty)}</option>`).join('');
+ $('#rDate').value=new Date().toISOString().slice(0,10); updateStages();
+}
+function updateStages(){const id=$('#rItem').value;const arr=state.stages.filter(s=>s.job_item_id===id);$('#rStage').innerHTML='<option value="">ללא שלב</option>'+arr.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')}
+async function saveReport(){const body={job_item_id:$('#rItem').value,item_stage_id:$('#rStage').value||null,log_date:$('#rDate').value,quantity:$('#rQty').value,machine_type:$('#rMachine').value,notes:$('#rNotes').value};if(!body.job_item_id||!body.log_date){$('#saveMsg').textContent='יש לבחור פריט ותאריך';return}$('#saveMsg').textContent='שומר...';try{await api('/api/logs',{method:'POST',body:JSON.stringify(body)});$('#saveMsg').textContent='הדיווח נשמר';state.logs=await api('/api/logs');renderDash();$('#rQty').value='';$('#rNotes').value=''}catch(e){$('#saveMsg').textContent='שמירה נכשלה'}}
+$$('.navbtn').forEach(b=>b.onclick=()=>{$$('.navbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.view').forEach(v=>v.classList.remove('active'));$('#'+b.dataset.view).classList.add('active');$('#title').textContent=b.textContent});
+$('#loginBtn').onclick=login;$('#password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('#logoutBtn').onclick=async()=>{await api('/api/logout',{method:'POST'});showLogin()};$('#orderSearch').oninput=renderOrders;$('#customerSearch').oninput=renderCustomers;$('#rItem').onchange=updateStages;$('#saveReport').onclick=saveReport;
+(async()=>{try{const s=await fetch('/api/session').then(r=>r.json());if(s.authenticated){showApp();await loadAll()}else showLogin()}catch{showLogin()}})();
+</script>
+</body>
+</html>
