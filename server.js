@@ -16,7 +16,7 @@ if (!SUPABASE_URL || !SUPABASE_KEY || !APP_PASSWORD || !SESSION_TOKEN) {
 
 function send(res, status, body, type='application/json; charset=utf-8', headers={}) {
   res.writeHead(status, {'Content-Type': type, ...headers});
-  res.end(typeof body === 'string' ? body : JSON.stringify(body));
+  res.end(typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body));
 }
 
 function cookies(req) {
@@ -33,6 +33,12 @@ function authed(req) {
   return cookies(req).ezon_session === SESSION_TOKEN;
 }
 
+function safeEqual(a,b){
+  const ha=crypto.createHash('sha256').update(String(a)).digest();
+  const hb=crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha,hb);
+}
+
 async function readBody(req) {
   return new Promise((resolve, reject) => {
     let data='';
@@ -46,7 +52,7 @@ async function readBody(req) {
 }
 
 async function sb(table, query='select=*', opts={}) {
-  const url = `${SUPABASE_URL}/rest/v1/${table}?${query}`;
+  const url = `${SUPABASE_URL}/rest/v1/${table}${query ? `?${query}` : ''}`;
   const r = await fetch(url, {
     method: opts.method || 'GET',
     headers: {
@@ -73,8 +79,7 @@ const server = http.createServer(async (req, res) => {
 
     if (u.pathname === '/api/login' && req.method === 'POST') {
       const body = await readBody(req);
-      const ok = crypto.timingSafeEqual(Buffer.from(String(body.password || '')), Buffer.from(APP_PASSWORD.padEnd(String(body.password || '').length, '\0').slice(0, String(body.password || '').length))) && String(body.password || '') === APP_PASSWORD;
-      if (!ok) return send(res, 401, {ok:false, error:'סיסמה שגויה'});
+      if (!safeEqual(body.password || '', APP_PASSWORD)) return send(res, 401, {ok:false, error:'סיסמה שגויה'});
       return send(res, 200, {ok:true}, 'application/json; charset=utf-8', {
         'Set-Cookie': `ezon_session=${encodeURIComponent(SESSION_TOKEN)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000`
       });
@@ -86,11 +91,11 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
-    if (u.pathname === '/api/session') return send(res, 200, {authenticated: authed(req)});
+    if (u.pathname === '/api/session' && req.method === 'GET') return send(res, 200, {authenticated: authed(req)});
 
     if (u.pathname.startsWith('/api/') && !authed(req)) return send(res, 401, {error:'unauthorized'});
 
-    if (u.pathname === '/api/dashboard') {
+    if (u.pathname === '/api/dashboard' && req.method === 'GET') {
       const [orders, invoices, receipts, jobs, items, logs] = await Promise.all([
         sb('rivhit_orders','select=order_number,customer_name,order_date,amount,is_closed&order=order_date.desc&limit=50'),
         sb('rivhit_invoices','select=document_number,customer_name,document_date,amount,is_closed&order=document_date.desc&limit=50'),
@@ -102,32 +107,32 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, {orders,invoices,receipts,jobs,items,logs});
     }
 
-    if (u.pathname === '/api/orders') {
+    if (u.pathname === '/api/orders' && req.method === 'GET') {
       const data = await sb('rivhit_orders','select=*&order=order_date.desc&limit=300');
       return send(res, 200, data);
     }
 
-    if (u.pathname === '/api/customers') {
+    if (u.pathname === '/api/customers' && req.method === 'GET') {
       const data = await sb('rivhit_customers','select=customer_id,customer_name,updated_at&order=customer_name.asc&limit=500');
       return send(res, 200, data);
     }
 
-    if (u.pathname === '/api/jobs') {
+    if (u.pathname === '/api/jobs' && req.method === 'GET') {
       const data = await sb('production_jobs','select=*&order=created_at.desc&limit=300');
       return send(res, 200, data);
     }
 
-    if (u.pathname === '/api/items') {
+    if (u.pathname === '/api/items' && req.method === 'GET') {
       const data = await sb('production_job_items','select=*&order=created_at.desc&limit=1000');
       return send(res, 200, data);
     }
 
-    if (u.pathname === '/api/stages') {
+    if (u.pathname === '/api/stages' && req.method === 'GET') {
       const data = await sb('production_item_stages','select=*&order=sort_order.asc&limit=2000');
       return send(res, 200, data);
     }
 
-    if (u.pathname === '/api/logs') {
+    if (u.pathname === '/api/logs' && req.method === 'GET') {
       const data = await sb('production_daily_log','select=*&order=log_date.desc,created_at.desc&limit=500');
       return send(res, 200, data);
     }
